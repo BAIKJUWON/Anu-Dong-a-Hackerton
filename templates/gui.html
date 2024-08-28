@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C 언어 시큐어 코딩 예시</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .code-example {
+            background-color: #fff;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .code-example h3 {
+            margin-top: 0;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            overflow: auto;
+        }
+        code {
+            display: block;
+            white-space: pre-wrap;
+        }
+        .bad-code {
+            border-left: 5px solid #e74c3c;
+        }
+        .good-code {
+            border-left: 5px solid #2ecc71;
+        }
+        #menu ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            background-color: #333;
+        }
+        #menu ul li {
+            margin: 0;
+            padding: 0;
+        }
+        #menu ul li a {
+            display: block;
+            padding: 10px 20px;
+            color: white;
+            text-decoration: none;
+        }
+        #menu ul li a:hover {
+            background-color: #575757;
+        }
+    </style>
+</head>
+<body>
+    <div id="menu">
+        <ul>
+            <li><a href="/">코드검사기</a></li>
+            <li><a href="/guide">보안상식</a></li>
+            <li><a href="/quiz">퀴즈</a></li>
+            <li><a href="/code_runner">코드러너</a></li>
+        </ul>
+    </div>
+
+    <h1>C 언어 시큐어 코딩 예시</h1>
+
+    <!-- 정수형 오버플로우 -->
+    <div class="code-example bad-code">
+        <h2>문제가 되는 코드</h2>
+        <h3>정수형 오버플로우</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+
+void vulnerable_function(int size) {
+    char buffer[10];
+    if (size &lt; 0) {
+        printf("음수 크기입니다!\n");
+    }
+    // 잠재적으로 음수 크기 또는 큰 크기를 허용하여 오버플로우 발생 가능
+    char* ptr = (char*)malloc(size);
+    if (ptr) {
+        strcpy(ptr, buffer);
+    }
+}
+
+int main() {
+    int size = -1; // 음수 크기
+    vulnerable_function(size);
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <div class="code-example good-code">
+        <h2>해결된 코드</h2>
+        <h3>정수형 오버플로우 방지</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+void secure_function(int size) {
+    char buffer[10];
+    if (size &lt; 0 || size &gt; 1000) { // 크기 제한 추가
+        printf("잘못된 크기입니다!\n");
+        return;
+    }
+    char* ptr = (char*)malloc(size);
+    if (ptr) {
+        strncpy(ptr, buffer, size);
+        ptr[size - 1] = '\0'; // NULL로 종료
+    }
+}
+
+int main() {
+    int size = 10; // 유효한 크기
+    secure_function(size);
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <!-- 메모리 버퍼 오버플로우 -->
+    <div class="code-example bad-code">
+        <h2>문제가 되는 코드</h2>
+        <h3>메모리 버퍼 오버플로우</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+void vulnerable_function(char *str) {
+    char buffer[10];
+    strcpy(buffer, str); // 버퍼 오버플로우 발생 가능
+    printf("입력된 문자열: %s\n", buffer);
+}
+
+int main() {
+    char input[20];
+    printf("문자열을 입력하세요: ");
+    gets(input); // 취약한 함수 사용
+    vulnerable_function(input);
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <div class="code-example good-code">
+        <h2>해결된 코드</h2>
+        <h3>메모리 버퍼 오버플로우 방지</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+void secure_function(char *str) {
+    char buffer[10];
+    strncpy(buffer, str, sizeof(buffer) - 1);
+    buffer[sizeof(buffer) - 1] = '\0'; // NULL로 종료
+    printf("입력된 문자열: %s\n", buffer);
+}
+
+int main() {
+    char input[20];
+    printf("문자열을 입력하세요: ");
+    fgets(input, sizeof(input), stdin); // 안전한 함수 사용
+    input[strcspn(input, "\n")] = '\0'; // 개행 문자 제거
+    secure_function(input);
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <!-- 포맷 스트링 삽입 -->
+    <div class="code-example bad-code">
+        <h2>문제가 되는 코드</h2>
+        <h3>포맷 스트링 삽입</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+
+void vulnerable_function(char *str) {
+    printf(str); // 포맷 문자열 취약점
+}
+
+int main() {
+    char input[100];
+    printf("문자열을 입력하세요: ");
+    gets(input); // 취약한 함수 사용
+    vulnerable_function(input);
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <div class="code-example good-code">
+        <h2>해결된 코드</h2>
+        <h3>포맷 스트링 삽입 방지</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+
+void secure_function(char *str) {
+    printf("%s", str); // 안전한 출력
+}
+
+int main() {
+    char input[100];
+    printf("문자열을 입력하세요: ");
+    fgets(input, sizeof(input), stdin);
+    input[strcspn(input, "\n")] = '\0'; // 개행 문자 제거
+    secure_function(input);
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <!-- NULL 포인터 역참조 -->
+    <div class="code-example bad-code">
+        <h2>문제가 되는 코드</h2>
+        <h3>NULL 포인터 역참조</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+
+void vulnerable_function(char *str) {
+    if (str == NULL) {
+        printf("NULL 포인터를 역참조하려고 합니다!\n");
+    }
+    printf("입력된 문자열: %s\n", str);
+}
+
+int main() {
+    char *input = NULL;
+    vulnerable_function(input);
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <div class="code-example good-code">
+        <h2>해결된 코드</h2>
+        <h3>NULL 포인터 역참조 방지</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+
+void secure_function(char *str) {
+    if (str == NULL) {
+        printf("NULL 포인터입니다.\n");
+        return;
+    }
+    printf("입력된 문자열: %s\n", str);
+}
+
+int main() {
+    char input[100] = "Hello, World!";
+    secure_function(input);
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <!-- 중요한 자원에 대한 잘못된 권한 설정 -->
+    <div class="code-example bad-code">
+        <h2>문제가 되는 코드</h2>
+        <h3>중요한 자원에 대한 잘못된 권한 설정</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+void vulnerable_function() {
+    FILE *file = fopen("important_file.txt", "w"); // 권한 설정 취약점
+    if (file) {
+        fprintf(file, "중요한 데이터");
+        fclose(file);
+    }
+}
+
+int main() {
+    vulnerable_function();
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <div class="code-example good-code">
+        <h2>해결된 코드</h2>
+        <h3>중요한 자원에 대한 올바른 권한 설정</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;sys/stat.h&gt;
+
+void secure_function() {
+    FILE *file = fopen("important_file.txt", "w"); // 파일을 안전하게 열기
+    if (file) {
+        if (chmod("important_file.txt", S_IRUSR | S_IWUSR) == -1) { // 권한 설정
+            perror("chmod");
+        }
+        fprintf(file, "중요한 데이터");
+        fclose(file);
+    }
+}
+
+int main() {
+    secure_function();
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <!-- 종료되지 않는 반복문 또는 재귀함수의 사용 -->
+    <div class="code-example bad-code">
+        <h2>문제가 되는 코드</h2>
+        <h3>종료되지 않는 반복문 또는 재귀함수의 사용</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+
+void vulnerable_function(int n) {
+    if (n &gt; 0) {
+        vulnerable_function(n); // 무한 재귀 호출 가능
+    }
+}
+
+int main() {
+    vulnerable_function(10);
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <div class="code-example good-code">
+        <h2>해결된 코드</h2>
+        <h3>종료되지 않는 재귀함수 방지</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+
+void secure_function(int n) {
+    if (n &gt; 0) {
+        secure_function(n - 1); // 재귀 호출 제한
+    }
+}
+
+int main() {
+    secure_function(10);
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <!-- 부적절한 예외 처리 -->
+    <div class="code-example bad-code">
+        <h2>문제가 되는 코드</h2>
+        <h3>부적절한 예외 처리</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+
+int vulnerable_function() {
+    FILE *file = fopen("nonexistent.txt", "r");
+    if (file == NULL) {
+        // 오류 상황 무시
+        return -1;
+    }
+    fclose(file);
+    return 0;
+}
+
+int main() {
+    vulnerable_function();
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <div class="code-example good-code">
+        <h2>해결된 코드</h2>
+        <h3>적절한 예외 처리</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+
+int secure_function() {
+    FILE *file = fopen("nonexistent.txt", "r");
+    if (file == NULL) {
+        perror("파일 열기 오류");
+        return -1;
+    }
+    fclose(file);
+    return 0;
+}
+
+int main() {
+    secure_function();
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <!-- 초기화되지 않은 변수 사용 -->
+    <div class="code-example bad-code">
+        <h2>문제가 되는 코드</h2>
+        <h3>초기화되지 않은 변수 사용</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+
+void vulnerable_function() {
+    int uninitialized_var;
+    printf("초기화되지 않은 변수: %d\n", uninitialized_var); // 예측 불가능한 값 출력
+}
+
+int main() {
+    vulnerable_function();
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <div class="code-example good-code">
+        <h2>해결된 코드</h2>
+        <h3>변수 초기화</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+
+void secure_function() {
+    int initialized_var = 0; // 변수 초기화
+    printf("초기화된 변수: %d\n", initialized_var);
+}
+
+int main() {
+    secure_function();
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <!-- 취약한 API 사용 -->
+    <div class="code-example bad-code">
+        <h2>문제가 되는 코드</h2>
+        <h3>취약한 API 사용</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+
+void vulnerable_function() {
+    char buffer[50];
+    gets(buffer); // 취약한 함수 사용
+    printf("입력된 문자열: %s\n", buffer);
+}
+
+int main() {
+    vulnerable_function();
+    return 0;
+}
+        </code></pre>
+    </div>
+
+    <div class="code-example good-code">
+        <h2>해결된 코드</h2>
+        <h3>안전한 API 사용</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+
+void secure_function() {
+    char buffer[50];
+    fgets(buffer, sizeof(buffer), stdin); // 안전한 함수 사용
+    buffer[strcspn(buffer, "\n")] = '\0'; // 개행 문자 제거
+    printf("입력된 문자열: %s\n", buffer);
+}
+
+int main() {
+    secure_function();
+    return 0;
+}
+        </code></pre>
+    </div>
+</body>
+</html>

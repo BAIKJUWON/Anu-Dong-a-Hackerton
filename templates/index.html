@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        #menu {
+            background-color: #333;
+        }
+        #menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+        #menu ul li {
+            margin: 0;
+        }
+        #menu ul li a {
+            display: block;
+            padding: 15px 30px; /* 패딩을 키워 네비게이션 바의 크기를 조정 */
+            color: white;
+            text-decoration: none;
+            font-size: 18px; /* 글자 크기 조정 */
+        }
+        #menu ul li a:hover {
+            background-color: #575757;
+        }
+        #chatbox {
+            width: 500px;
+            margin: 20px auto; /* 상단과 하단에 여백을 추가 */
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        #chatbox input, #chatbox button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        #chatbox ul {
+            list-style: none;
+            padding: 0;
+        }
+        #chatbox ul li {
+            padding: 5px 0;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            overflow: auto;
+        }
+        code {
+            display: block;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div id="menu">
+        <ul>
+            <li><a href="/">코드검사기</a></li>
+            <li><a href="/guide">보안상식</a></li>
+            <li><a href="/quiz">퀴즈</a></li>
+            <li><a href="/code_runner">코드러너</a></li>
+        </ul>
+    </div>
+    <div id="chatbox">
+        <ul id="messages"></ul>
+        <input type="text" id="messageInput" placeholder="C 언어 코드를 입력하세요...">
+        <button onclick="sendMessage()">전송</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+
+            if (!message) return;
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            const messages = document.getElementById('messages');
+            const userMessage = document.createElement('li');
+            userMessage.textContent = `사용자: ${message}`;
+            messages.appendChild(userMessage);
+
+            const botMessage = document.createElement('li');
+            if (data.error) {
+                botMessage.textContent = `오류: ${data.error}`;
+            } else {
+                const pre = document.createElement('pre');
+                const code = document.createElement('code');
+                code.textContent = data.message;
+                pre.appendChild(code);
+                botMessage.appendChild(pre);
+            }
+            messages.appendChild(botMessage);
+
+            messageInput.value = '';
+        }
+    </script>
+</body>
+</html>
