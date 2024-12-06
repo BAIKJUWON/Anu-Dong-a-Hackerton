@@ -1,7 +1,5 @@
 # 인간GPT 팀 - 안동대학교 & 동아대학교 연합 해커톤 프로젝트
 
-# Anu-Dong-a-Hackerton
-
 인간GPT팀은 Python Flask와 ChatGPT API를 활용하여 C 언어의 보안적 결함을 해결하기 위한 웹 애플리케이션입니다.  
 이 프로젝트는 사용자 친화적인 인터페이스와 AI 기반 분석을 통해 안전한 코딩 환경을 제공합니다.
 
@@ -43,5 +41,5 @@ C 언어는 강력한 프로그래밍 언어지만 메모리 관리와 보안 �
 - **API**: OpenAI ChatGPT API
 - **프론트엔드 템플릿**: StartBootstrap
 
-  ## 💻 발표 자료
+## 💻 발표 자료
 - [발표자료](https://github.com/BAIKJUWON/Anu-Dong-a-Hackerton/blob/main/%E1%84%92%E1%85%A2%E1%84%8F%E1%85%A5%E1%84%90%E1%85%A9%E1%86%AB.pdf)
