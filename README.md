@@ -5,7 +5,7 @@
 SecureGPT는 사용자가 입력한 C 언어 코드를 분석하여 잠재적인 보안 취약점을 안내하고, 안전한 코드 작성 방법과 보안 지식을 학습할 수 있도록 제작한 웹 기반 교육 서비스입니다.
 
 <p align="center">
-  <img src="docs/images/securegpt-main.png" alt="SecureGPT 메인 화면" width="850">
+  <img src="docs/images/1.png" alt="SecureGPT 메인 화면" width="850">
 </p>
 
 ---
@@ -78,7 +78,7 @@ C 언어 코드 입력
 ```
 
 <p align="center">
-  <img src="docs/images/code-checker.png" alt="SecureGPT 코드 검사기" width="850">
+  <img src="docs/images/2.png" alt="SecureGPT 코드 검사기" width="850">
 </p>
 
 #### 분석 대상 예시
@@ -101,7 +101,7 @@ C 언어 코드 입력
 C 언어 프로그램에서 자주 발생하는 보안 취약점을 설명하는 학습 페이지입니다.
 
 <p align="center">
-  <img src="docs/images/security-guide.png" alt="SecureGPT 보안 상식 페이지" width="850">
+  <img src="docs/images/3.png" alt="SecureGPT 보안 상식 페이지" width="850">
 </p>
 
 #### 제공하는 보안 개념
@@ -126,7 +126,7 @@ C 언어 프로그램에서 자주 발생하는 보안 취약점을 설명하는
 보안 상식 페이지에서 학습한 내용을 문제로 확인할 수 있습니다.
 
 <p align="center">
-  <img src="docs/images/security-quiz.png" alt="SecureGPT 시큐어 코딩 퀴즈" width="850">
+  <img src="docs/images/4.png" alt="SecureGPT 시큐어 코딩 퀴즈" width="850">
 </p>
 
 각 문항은 하나의 정답을 선택하는 방식으로 구현했습니다.
@@ -168,7 +168,7 @@ function submitQuiz(quizId, correctAnswers) {
 제공된 코드 가이드에는 정수형 오버플로우, 버퍼 오버플로우, 포맷 문자열 취약점, NULL 포인터 역참조 등의 예시가 포함되어 있습니다. :contentReference[oaicite:3]{index=3}
 
 <p align="center">
-  <img src="docs/images/code-guide.png" alt="SecureGPT 코드 가이드" width="850">
+  <img src="docs/images/5.png" alt="SecureGPT 코드 가이드" width="850">
 </p>
 
 #### 코드 비교 예시
